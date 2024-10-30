@@ -1,0 +1,12 @@
+.idea/
+
+# Artifacts from clion
+*/cmake-build-debug/*
+
+#Artifacts from vscode
+# *.vscode
+*.pyc
+*/__pychache__
+.DS_Store
+data/
+scripts/test/output/*
