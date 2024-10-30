@@ -1,6 +1,3 @@
-% https://rikei-tawamure.com/entry/2020/07/24/162236
-%
-
 % ランタイムの設定
 clc;
 clear;
@@ -42,11 +39,11 @@ function out = ymdot(t, ym, psi)
     out = V * sin(psi);
 end
 
-function out = _xs(xm, ym, xms, yms, psi)
+function out = xs(xm, ym, xms, yms, psi)
     out = cos(psi) * xms - sin(psi) * yms + xm;
 end
 
-function out = _ys(xm, ym, xms, yms, psi)
+function out = ys(xm, ym, xms, yms, psi)
     out = sin(psi) * xms + cos(psi) * yms + ym;
 end
 
@@ -83,24 +80,24 @@ ym = r1;
 psi = pi;
 omega = 0;
 yref = 1.0;
-xs = _xs(xm, ym, xms, yms, psi);
-ys = _ys(xm, ym, xms, yms, psi);
+xs_ = xs(xm, ym, xms, yms, psi);
+ys_ = ys(xm, ym, xms, yms, psi);
 
 % センサがあるエリアで場合分け
-if xs >= 0
-    s1 = sqrt((xs - x10)^2 + (ys - y10)^2);
+if xs_ >= 0
+    s1 = sqrt((xs_ - x10)^2 + (ys_ - y10)^2);
     ls1 = s1 - r1;
     minls = ls1;
-elseif xs <= -5.0
-    s3 = sqrt((xs - x30)^2 + (ys - y30)^2);
+elseif xs_ <= -5.0
+    s3 = sqrt((xs_ - x30)^2 + (ys_ - y30)^2);
     ls3 = s3 - r1;
     minls = ls3;  
-elseif ys > 0
-    s2 = sqrt((xs - x20)^2 + (ys - y20)^2);
+elseif ys_ > 0
+    s2 = sqrt((xs_ - x20)^2 + (ys_ - y20)^2);
     ls2 = s2 - r2;
     minls = ls2;
 else
-    s4 = sqrt((xs - x40)^2 + (ys - y40)^2);
+    s4 = sqrt((xs_ - x40)^2 + (ys_ - y40)^2);
     ls4 = s4 - r2;
     minls = ls4;
 end
@@ -113,7 +110,7 @@ h = 1e-5;
 
 % 制御周期
 Cpriod = 1e-3;
-_Cpriod = Cpriod / h;
+Cpriod = Cpriod / h;
 
 % 計算時間(s)
 TrackLength = 16; % [m]
@@ -124,8 +121,8 @@ N = round(Tcalc / h);
 for n = 1:N
     Xm(end + 1) = xm;
     Ym(end + 1) = ym;
-    Xs(end + 1) = xs;
-    Ys(end + 1) = ys;
+    Xs(end + 1) = xs_;
+    Ys(end + 1) = ys_;
     Psi(end + 1) = psi * 180 / pi;
     Psi_dot(end + 1) = omega * 180 / pi;
     Psi_dot_com(end + 1) = psi_dot_com * 180 / pi;
@@ -133,22 +130,22 @@ for n = 1:N
     T(end + 1) = t;
 
     % ライン検知
-    if mod(n, _Cpriod) == 0
+    if mod(n, Cpriod) == 0
         % センサがあるエリアで場合分け
-        if xs >= 0
-            s1 = sqrt((xs - x10)^2 + (ys - y10)^2);
+        if xs_ >= 0
+            s1 = sqrt((xs_ - x10)^2 + (ys_ - y10)^2);
             ls1 = s1 - r1;
             minls = ls1;
-        elseif xs <= -5.0
-            s3 = sqrt((xs - x30)^2 + (ys - y30)^2);
+        elseif xs_ <= -5.0
+            s3 = sqrt((xs_ - x30)^2 + (ys_ - y30)^2);
             ls3 = s3 - r1;
             minls = ls3;
-        elseif ys > 0
-            s2 = sqrt((xs - x20)^2 + (ys - y20)^2);
+        elseif ys_ > 0
+            s2 = sqrt((xs_ - x20)^2 + (ys_ - y20)^2);
             ls2 = s2 - r2;
             minls = ls2;
         else
-            s4 = sqrt((xs - x40)^2 + (ys - y40)^2);
+            s4 = sqrt((xs_ - x40)^2 + (ys_ - y40)^2);
             ls4 = s4 - r2;
             minls = ls4;
         end
@@ -160,7 +157,7 @@ for n = 1:N
     % 状態変数保存    
     oldminls = minls;
     oldpsi = psi;
-    oldys = ys;
+    oldys = ys_;
     oldym = ym;
     oldxm = xm;
     oldomega = omega;
@@ -172,8 +169,8 @@ for n = 1:N
     psi = rk4(@psidot, t, h, oldpsi, oldomega);
 
     % センサ位置算出
-    xs = _xs(xm, ym, xms, yms, psi);
-    ys = _ys(xm, ym, xms, yms, psi);
+    xs_ = xs(xm, ym, xms, yms, psi);
+    ys_ = ys(xm, ym, xms, yms, psi);
     
     % 時間更新
     t = t + h;
@@ -182,8 +179,8 @@ end
 % 最後の値を追加
 Xm(end + 1) = xm;
 Ym(end + 1) = ym;
-Xs(end + 1) = xs;
-Ys(end + 1) = ys;
+Xs(end + 1) = xs_;
+Ys(end + 1) = ys_;
 Psi(end + 1) = psi * 180 / pi;
 Psi_dot(end + 1) = omega * 180 / pi;
 Psi_dot_com(end + 1) = psi_dot_com * 180 / pi;
@@ -227,4 +224,28 @@ subplot(5, 1, 5);
 th1 = linspace(-pi/2, pi/2, 100000);
 x1 = r1 * cos(th1);
 y1 = r1 * sin(th1);
-x20 = -2
+x20 = -2.5;
+y20 = -1e4;
+r2 = sqrt((x20)^2 + (y20 - 1.0)^2);
+tmp = asin(2.5 / r2);
+th2 = linspace(pi/2 - tmp, pi/2 + tmp, 100000);
+x2 = r2 * cos(th2) + x20;
+y2 = r2 * sin(th2) + y20;
+
+% ラインをプロット
+plot(x1, y1, 'b', 'DisplayName', 'Line');
+hold on;
+plot(x2, y2, 'b');
+plot(x2, -y2, 'b');
+plot(-x1 - 5, y1, 'b');
+
+% ロボットの軌跡をプロット
+plot(Xm(1:10:end), Ym(1:10:end), 'DisplayName', 'CG');
+plot(Xs(1:10:end), Ys(1:10:end), 'DisplayName', 'Sensor');
+
+xlabel('X[m]');
+ylabel('Y[m]');
+legend('Location', 'best');
+grid on;
+
+hold off;
