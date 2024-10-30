@@ -187,8 +187,13 @@ Psi_dot_com(end + 1) = psi_dot_com * 180 / pi;
 Minls(end + 1) = minls;
 T(end + 1) = t;
 
+
+%% plot
 % グラフの描画
-figure('Position', [100, 100, 1100, 1600]);
+% f = figure;
+f = figure('WindowStyle', 'normal');
+f.Position = [100, 100, 1100, 1600];
+% f = figure('Position', [100, 100, 1100, 1600]);
 
 % ysのグラフ
 subplot(5, 1, 1);
@@ -204,7 +209,7 @@ grid on;
 
 % 角速度のグラフ
 subplot(5, 1, 3);
-plot(T(1:10:end), Psi_dot(1:10:end), 'DisplayName', 'Psi_dot');
+plot(T(1:10:end), Psi_dot(1:10:end), 'DisplayName', 'Psi dot');
 hold on;
 plot(T(1:10:end), Psi_dot_com(1:10:end), 'DisplayName', 'Command');
 xlabel('Time[s]');
