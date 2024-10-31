@@ -20,7 +20,7 @@ LED_G = 22
 MOTOR_PWM = 12
 
 # バッテリー電圧と最大モーター電圧の設定
-BATTERY_VOLTAGE = 3.0  # 実際のバッテリー電圧に変更
+BATTERY_VOLTAGE = 2.6  # 実際のバッテリー電圧に変更
 MAX_VOLTAGE = 3.0      # モーターに供給する最大電圧
 
 # pigpioの初期化
@@ -50,24 +50,44 @@ motor_pwm_init(pi, MOTOR_PWM)
 
 pi.write(LED_Y, 1)
 
-
+# 開始時刻を記録
+start_time = time.time()
 
 # メインループ
 try:
     while True:
-        # テスト用にモーター電圧を設定（-MAX_VOLTAGEから+MAX_VOLTAGEの範囲）
-        motor_value = 3.0  # 必要に応じて調整
-        update_motor = True  # モーター制御を更新するかどうか
+        # 経過時間を計算
+        elapsed_time = time.time() - start_time
 
+        if elapsed_time < 3.0:
+            # 最初の3秒間はmotor_value=3.0
+            motor_value = 3.0
+            update_motor = True
+        elif elapsed_time < 6.0:
+            # 次の3秒間はmotor_value=-3.0
+            motor_value = -3.0
+            update_motor = True
+        else:
+            # 6秒経過後はモーターを停止
+            motor_value = 0.0
+            update_motor = False
+
+        # モーター制御の更新
         motor_control_update(pi, motor_value, update_motor, MOTOR1_IN1, MOTOR1_IN2, MOTOR2_IN1, MOTOR2_IN2,
                              MOTOR_PWM, MAX_VOLTAGE, BATTERY_VOLTAGE, LED_G, LED_R)
         time.sleep(0.1)  # 必要に応じてスリープ時間を調整
 
+        if elapsed_time >= 6.0:
+            break  # ループを終了
+
 except KeyboardInterrupt:
+    pass  # Ctrl+Cによる終了を許可
+
+finally:
     # 終了時のクリーンアップ
     pi.write(LED_R, 0)
     pi.write(LED_Y, 0)
     pi.write(LED_G, 0)
-    motor_control_update(pi, 0, False, MOTOR1_IN1, MOTOR1_IN2, MOTOR2_IN1, MOTOR2_IN2,
+    motor_control_update(pi, 0.0, False, MOTOR1_IN1, MOTOR1_IN2, MOTOR2_IN1, MOTOR2_IN2,
                          MOTOR_PWM, MAX_VOLTAGE, BATTERY_VOLTAGE, LED_G, LED_R)
     pi.stop()
