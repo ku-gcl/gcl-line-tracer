@@ -1,6 +1,19 @@
 ## このリポジトリについて
 ライントレーサーのシミュレーション
 
+## 実行方法
+
+```bash
+cd
+git clone https://github.com/ku-gcl/gcl-line-tracer.git
+```
+
+```bash
+cd ~/gcl-line-tracer/python
+python mouse_motor_control.py
+```
+
+
 
 
 ## 各ファイルの説明

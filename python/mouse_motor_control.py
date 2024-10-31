@@ -1,6 +1,6 @@
 # ref: https://qiita.com/shi78ge/items/d4e8189094588b86a7b2
 
-import cv2
+# import cv2
 import time
 import RPi.GPIO as GPIO
 import pigpio
