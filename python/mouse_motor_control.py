@@ -52,6 +52,8 @@ pi.write(LED_Y, 1)
 
 # 開始時刻を記録
 start_time = time.time()
+move_time1 = 60
+move_time2 = 120
 
 # メインループ
 try:
@@ -59,11 +61,11 @@ try:
         # 経過時間を計算
         elapsed_time = time.time() - start_time
 
-        if elapsed_time < 3.0:
+        if elapsed_time < move_time1:
             # 最初の3秒間はmotor_value=3.0
             motor_value = 3.0
             update_motor = True
-        elif elapsed_time < 6.0:
+        elif elapsed_time < move_time2:
             # 次の3秒間はmotor_value=-3.0
             motor_value = -3.0
             update_motor = True
