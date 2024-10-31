@@ -42,13 +42,13 @@ pi.set_mode(MOTOR2_IN2, pigpio.OUTPUT)
 pi.write(LED_R, 1)
 pi.write(LED_Y, 1)
 pi.write(LED_G, 1)
+time.sleep(0.1)
+pi.write(LED_Y, 1)
 
 # モーターの初期化
 motor_driver_init(pi, MOTOR1_IN1, MOTOR1_IN2)
 motor_driver_init(pi, MOTOR2_IN1, MOTOR2_IN2)
 motor_pwm_init(pi, MOTOR_PWM)
-
-pi.write(LED_Y, 1)
 
 # 開始時刻を記録
 start_time = time.time()
