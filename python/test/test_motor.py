@@ -22,11 +22,14 @@ pi.set_PWM_range(MOTOR1_IN2, 100)
 pi.set_PWM_dutycycle(MOTOR1_IN2, 0)
 
 time.sleep(1)
-print("start motor control")
+start_time = time.time()
 
-pi.set_PWM_dutycycle(MOTOR_PWM, 100)
-pi.set_PWM_dutycycle(MOTOR1_IN1, 100)
-pi.set_PWM_dutycycle(MOTOR1_IN2, 0)
+print("start motor control")
+while (time.time()-start_time < 60):
+    pi.set_PWM_dutycycle(MOTOR_PWM, 100)
+    pi.set_PWM_dutycycle(MOTOR1_IN1, 100)
+    pi.set_PWM_dutycycle(MOTOR1_IN2, 0)
+    time.sleep(1)
 
 pi.stop()
 
