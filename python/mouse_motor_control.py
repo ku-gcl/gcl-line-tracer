@@ -1,19 +1,29 @@
+# ref: https://qiita.com/shi78ge/items/d4e8189094588b86a7b2
+
 import cv2
 import time
 import RPi.GPIO as GPIO
 import pigpio
 
-#モーターの正転/逆転制御GPIO
+# モーターGPIO
+MOTOR1_IN1 = 6
+MOTOR1_IN2 = 5
+MOTOR2_IN1 = 19
+MOTOR2_IN2 = 13
+
+# モーター回転速度制御GPIO(PWM)
+MOTOR_VREF = 12
+
+# モーターの正転/逆転制御GPIO
 GPIO.setwarnings(False) 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(17, GPIO.OUT)
-GPIO.setup(27, GPIO.OUT)
+GPIO.setup(MOTOR1_IN1, GPIO.OUT)
+GPIO.setup(MOTOR1_IN2, GPIO.OUT)
+GPIO.setup(MOTOR2_IN1, GPIO.OUT)
+GPIO.setup(MOTOR2_IN2, GPIO.OUT)
 
-#モーター回転速度制御GPIO(PWM)
-gpio_pin0 = 12
-gpio_pin1 = 13
 pi = pigpio.pi()
-pi.set_mode(gpio_pin0, pigpio.OUTPUT)
+pi.set_mode(MOTOR_VREF, pigpio.OUTPUT)
 
 #モーター制御パラメータ
 duty1 = 4  #直進時のDuty比
@@ -65,43 +75,43 @@ while True:
     #左右のブロックエリアへの接触を検出したら、停止線と判定して停止する
     elif Det_LB > 0 and Det_RB > 0:
         print("停止線への接触を検出しました")        
-        GPIO.output(17, GPIO.HIGH)
-        GPIO.output(27, GPIO.HIGH)
-        pi.hardware_PWM(gpio_pin0, freq, 000000)
-        pi.hardware_PWM(gpio_pin1, freq, 000000)
+        GPIO.output(MOTOR1_IN1, GPIO.HIGH)
+        GPIO.output(MOTOR1_IN2, GPIO.HIGH)
+        pi.hardware_PWM(MOTOR_VREF, freq, 000000)
+        pi.hardware_PWM(MOTOR_VREF, freq, 000000)
         break
     
     #LB接触→右旋回
     elif Det_LB > 0:
         print("左ブロックエリアへの接触を検出しました")      
-        GPIO.output(17, GPIO.HIGH)
-        GPIO.output(27, GPIO.LOW)
-        pi.hardware_PWM(gpio_pin0, freq, duty2*100000)
-        pi.hardware_PWM(gpio_pin1, freq, duty2*100000)
+        GPIO.output(MOTOR1_IN1, GPIO.HIGH)
+        GPIO.output(MOTOR1_IN2, GPIO.LOW)
+        pi.hardware_PWM(MOTOR_VREF, freq, duty2*100000)
+        pi.hardware_PWM(MOTOR_VREF, freq, duty2*100000)
         time.sleep(sleep_time2)
-        pi.hardware_PWM(gpio_pin0, freq, 000000)
-        pi.hardware_PWM(gpio_pin1, freq, 000000)
+        pi.hardware_PWM(MOTOR_VREF, freq, 000000)
+        pi.hardware_PWM(MOTOR_VREF, freq, 000000)
         
     #RB接触→左旋回
     elif Det_RB > 0:
         print("右ブロックエリアへの接触を検出しました")
-        GPIO.output(17, GPIO.LOW)
-        GPIO.output(27, GPIO.HIGH)
-        pi.hardware_PWM(gpio_pin0, freq, duty2*100000)
-        pi.hardware_PWM(gpio_pin1, freq, duty2*100000)
+        GPIO.output(MOTOR1_IN1, GPIO.LOW)
+        GPIO.output(MOTOR1_IN2, GPIO.HIGH)
+        pi.hardware_PWM(MOTOR_VREF, freq, duty2*100000)
+        pi.hardware_PWM(MOTOR_VREF, freq, duty2*100000)
         time.sleep(sleep_time2)
-        pi.hardware_PWM(gpio_pin0, freq, 000000)
-        pi.hardware_PWM(gpio_pin1, freq, 000000)
+        pi.hardware_PWM(MOTOR_VREF, freq, 000000)
+        pi.hardware_PWM(MOTOR_VREF, freq, 000000)
         
     #ブロックエリアへの接触なし→前進
     else :
-        GPIO.output(17, GPIO.HIGH)
-        GPIO.output(27, GPIO.HIGH)
-        pi.hardware_PWM(gpio_pin0, freq, duty1*100000)
-        pi.hardware_PWM(gpio_pin1, freq, duty1*100000)
+        GPIO.output(MOTOR1_IN1, GPIO.HIGH)
+        GPIO.output(MOTOR1_IN2, GPIO.HIGH)
+        pi.hardware_PWM(MOTOR_VREF, freq, duty1*100000)
+        pi.hardware_PWM(MOTOR_VREF, freq, duty1*100000)
         time.sleep(sleep_time1)
-        pi.hardware_PWM(gpio_pin0, freq, 000000)
-        pi.hardware_PWM(gpio_pin1, freq, 000000)
+        pi.hardware_PWM(MOTOR_VREF, freq, 000000)
+        pi.hardware_PWM(MOTOR_VREF, freq, 000000)
         
 # 撮影用オブジェクトとウィンドウの解放
 camera.release()
