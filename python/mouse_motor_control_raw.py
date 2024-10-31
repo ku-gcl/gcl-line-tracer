@@ -121,7 +121,8 @@ try:
         pwm_duty = int(abs(motor_value) * 100.0 / BATTERY_VOLTAGE)
         if pwm_duty > 100:
             pwm_duty = 100  # 100%を超えないように制限
-            
+        
+        print(motor_value)
         print(pwm_duty)
 
         # モーターの駆動方向に応じてGPIOピンを制御
