@@ -33,13 +33,19 @@ time.sleep(1)
 start_time = time.time()
 
 print("start motor control")
-while (time.time()-start_time < 30):
-    pwm_duty = 100
-    
-    pi.set_PWM_dutycycle(MOTOR_PWM, 100)  # PWMを100%に設定
-    pi.set_PWM_dutycycle(MOTOR1_IN1, pwm_duty)  # IN1にデューティサイクルを設定
+try:
+    while (time.time()-start_time < 5):
+        pwm_duty = 100
+        
+        pi.set_PWM_dutycycle(MOTOR_PWM, 100)  # PWMを100%に設定
+        pi.set_PWM_dutycycle(MOTOR1_IN1, pwm_duty)  # IN1にデューティサイクルを設定
+        pi.set_PWM_dutycycle(MOTOR1_IN2, 0)         # IN2を0に設定
+        time.sleep(1)
+finally:
+    pi.set_PWM_dutycycle(MOTOR_PWM, 0)  # PWMを100%に設定
+    pi.set_PWM_dutycycle(MOTOR1_IN1, 0)  # IN1にデューティサイクルを設定
     pi.set_PWM_dutycycle(MOTOR1_IN2, 0)         # IN2を0に設定
-    time.sleep(1)
+
 
 pi.stop()
 

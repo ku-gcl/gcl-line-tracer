@@ -52,8 +52,8 @@ motor_pwm_init(pi, MOTOR_PWM)
 
 # 開始時刻を記録
 start_time = time.time()
-move_time1 = 60
-move_time2 = 120
+move_time1 = 3
+move_time2 = 6
 
 # メインループ
 try:
