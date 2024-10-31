@@ -27,32 +27,26 @@ def motor_pwm_init(pi, PWM):
     pi.set_PWM_range(PWM, 100)        # 範囲100
     pi.set_PWM_dutycycle(PWM, 0)      # デューティサイクル0%
 
-def motor_control_update(pi, update_motor, MOTOR1_IN1, MOTOR1_IN2, MOTOR2_IN1, MOTOR2_IN2, MOTOR_PWM, MAX_VOLTAGE, BATTERY_VOLTAGE, LED_G, LED_R):
+def motor_control_update(pi, motor_value, update_motor, MOTOR1_IN1, MOTOR1_IN2, MOTOR2_IN1, MOTOR2_IN2,
+                         MOTOR_PWM, MAX_VOLTAGE, BATTERY_VOLTAGE, LED_G, LED_R):
     """
     モーター制御を更新
-    
+
     Args:
         pi: pigpioのインスタンス
+        motor_value (float): モーターに供給したい電圧（-MAX_VOLTAGEから+MAX_VOLTAGE）
         update_motor (bool): モーターを更新するかどうか
     """
-    global motor_value, pwm_duty, motor_direction
-
     if not update_motor:
         # モーター制御をリセット
-        motor_value = 0.0
-        pwm_duty = 0
-        pi.set_PWM_dutycycle(MOTOR_PWM, pwm_duty)
+        pi.set_PWM_dutycycle(MOTOR_PWM, 0)
         pi.write(MOTOR1_IN1, 0)
         pi.write(MOTOR1_IN2, 0)
         pi.write(MOTOR2_IN1, 0)
         pi.write(MOTOR2_IN2, 0)
         pi.write(LED_G, 0)
         pi.write(LED_R, 0)
-        motor_direction = 0
         return
-
-    # モーター制御の更新処理
-    motor_value = 0.0
 
     # モーター電圧の制限
     if motor_value > MAX_VOLTAGE:
@@ -61,10 +55,12 @@ def motor_control_update(pi, update_motor, MOTOR1_IN1, MOTOR1_IN2, MOTOR2_IN1, M
         motor_value = -MAX_VOLTAGE
 
     # PWMデューティサイクルの計算
-    pwm_duty = int(motor_value * 100.0 / BATTERY_VOLTAGE)
+    pwm_duty = int(abs(motor_value) * 100.0 / BATTERY_VOLTAGE)
+    if pwm_duty > 100:
+        pwm_duty = 100  # 100%を超えないように制限
 
     # モーターの駆動方向に応じてGPIOピンを制御
-    if pwm_duty >= 0:
+    if motor_value >= 0:
         # 順転
         pi.set_PWM_dutycycle(MOTOR_PWM, 100)  # PWMを100%に設定
 
@@ -75,10 +71,7 @@ def motor_control_update(pi, update_motor, MOTOR1_IN1, MOTOR1_IN2, MOTOR2_IN1, M
 
         pi.write(LED_G, 1)  # 緑LEDを点灯
         pi.write(LED_R, 0)  # 赤LEDを消灯
-        motor_direction = 1
     else:
-        # PWMデューティサイクルの絶対値を計算
-        pwm_duty = abs(pwm_duty)
         # 逆転
         pi.set_PWM_dutycycle(MOTOR_PWM, 100)  # PWMを100%に設定
 
@@ -89,4 +82,3 @@ def motor_control_update(pi, update_motor, MOTOR1_IN1, MOTOR1_IN2, MOTOR2_IN1, M
 
         pi.write(LED_G, 0)  # 緑LEDを消灯
         pi.write(LED_R, 1)  # 赤LEDを点灯
-        motor_direction = 2
