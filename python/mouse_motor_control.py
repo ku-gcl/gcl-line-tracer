@@ -79,7 +79,7 @@ try:
                              MOTOR_PWM, MAX_VOLTAGE, BATTERY_VOLTAGE, LED_G, LED_R)
         time.sleep(0.1)  # 必要に応じてスリープ時間を調整
 
-        if elapsed_time >= 6.0:
+        if elapsed_time >= move_time2:
             break  # ループを終了
 
 except KeyboardInterrupt:
