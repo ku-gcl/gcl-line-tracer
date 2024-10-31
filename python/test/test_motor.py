@@ -10,14 +10,21 @@ pi = pigpio.pi()
 
 pi.set_mode(MOTOR_PWM, pigpio.OUTPUT)
 pi.set_mode(MOTOR1_IN1, pigpio.OUTPUT)
-# pi.set_mode(MOTOR1_IN2, pigpio.OUTPUT)
+pi.set_mode(MOTOR1_IN2, pigpio.OUTPUT)
 
+# Motor 1
 pi.write(MOTOR1_IN1, 0)
-# pi.write(MOTOR1_IN2, 0)
+pi.write(MOTOR1_IN2, 0)
+
 pi.set_PWM_frequency(MOTOR1_IN1, 10000)
 pi.set_PWM_range(MOTOR1_IN1, 100)
 pi.set_PWM_dutycycle(MOTOR1_IN1, 0)
 
+pi.set_PWM_frequency(MOTOR1_IN2, 10000)
+pi.set_PWM_range(MOTOR1_IN2, 100)
+pi.set_PWM_dutycycle(MOTOR1_IN2, 0)
+
+# PWM
 pi.set_PWM_frequency(MOTOR_PWM, 10000)  # 周波数10kHz
 pi.set_PWM_range(MOTOR_PWM, 100)        # 範囲100
 pi.set_PWM_dutycycle(MOTOR_PWM, 0)
