@@ -3,14 +3,7 @@ clc;
 clear;
 close all;
 
-% ルンゲ・クッタ法の定義
-function y = rk4(func, t, h, y, varargin)
-    k1 = h * func(t, y, varargin{:});
-    k2 = h * func(t + 0.5 * h, y + 0.5 * k1, varargin{:});
-    k3 = h * func(t + 0.5 * h, y + 0.5 * k2, varargin{:});
-    k4 = h * func(t + h, y + k3, varargin{:});
-    y = y + (k1 + 2 * k2 + 2 * k3 + k4) / 6;
-end
+addpath("function/")
 
 % ロボットの仕様
 function [V, xms, yms] = robot_spec()
@@ -153,7 +146,7 @@ for n = 1:N
         % 制御
         psi_dot_com = Kp * minls + Kd * (minls - oldminls) / Cpriod;
     end
-    
+
     % 状態変数保存    
     oldminls = minls;
     oldpsi = psi;
@@ -161,7 +154,7 @@ for n = 1:N
     oldym = ym;
     oldxm = xm;
     oldomega = omega;
-    
+
     % ルンゲ・クッタ呼び出し
     xm = rk4(@xmdot, t, h, oldxm, oldpsi);
     ym = rk4(@ymdot, t, h, oldym, oldpsi);
@@ -171,7 +164,7 @@ for n = 1:N
     % センサ位置算出
     xs_ = xs(xm, ym, xms, yms, psi);
     ys_ = ys(xm, ym, xms, yms, psi);
-    
+
     % 時間更新
     t = t + h;
 end
@@ -188,12 +181,10 @@ Minls(end + 1) = minls;
 T(end + 1) = t;
 
 
-%% plot
+%% プロット
 % グラフの描画
-% f = figure;
 f = figure('WindowStyle', 'normal');
 f.Position = [100, 100, 1100, 1600];
-% f = figure('Position', [100, 100, 1100, 1600]);
 
 % ysのグラフ
 subplot(5, 1, 1);
@@ -254,3 +245,66 @@ legend('Location', 'best');
 grid on;
 
 hold off;
+
+
+%% アニメーションの作成
+% アニメーション用のプロット作成
+anim_fig = figure('WindowStyle', 'normal');
+anim_fig.Position = [1200, 100, 800, 600];
+hold on;
+grid on;
+xlabel('X[m]');
+ylabel('Y[m]');
+title('ライントレーサーの走行予定');
+axis equal;
+
+% コースラインのプロット
+plot(x1, y1, 'b', 'DisplayName', 'Line');
+plot(x2, y2, 'b');
+plot(x2, -y2, 'b');
+plot(-x1 - 5, y1, 'b');
+
+% 軌跡全体を薄い色で表示
+plot(Xm, Ym, 'Color', [0.8 0.8 0.8], 'DisplayName', 'Trajectory');
+
+% ロボットの現在位置をプロット
+robot_plot = plot(Xm(1), Ym(1), 'ro', 'MarkerSize', 8, 'MarkerFaceColor', 'r', 'DisplayName', 'Robot');
+
+legend('Location', 'best');
+
+hold off;
+
+% アニメーションのパラメータ設定
+totalPoints = length(Xm);
+desired_fps = 30; % アニメーションのフレームレート
+dt = 1 / desired_fps; % フレーム間隔（秒）
+total_time = T(end); % シミュレーション全体の時間
+total_frames = desired_fps * total_time; % 総フレーム数
+frameStep = floor(totalPoints / total_frames); % フレームごとのステップ数
+
+% ダウンサンプリングが0になるのを防ぐ
+if frameStep < 1
+    frameStep = 1;
+end
+
+% アニメーションのループ
+disp('アニメーションを開始します...');
+for k = 1:frameStep:totalPoints
+    % ロボットの現在位置を更新
+    set(robot_plot, 'XData', Xm(k), 'YData', Ym(k));
+    
+    % 描画を更新
+    drawnow;
+    
+    % 表示間隔を調整
+    pause(dt);
+end
+
+% 最後のフレームを表示
+if mod(totalPoints, frameStep) ~= 0
+    set(robot_plot, 'XData', Xm(end), 'YData', Ym(end));
+    drawnow;
+    pause(dt);
+end
+
+disp('アニメーションが完了しました。');
