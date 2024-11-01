@@ -52,8 +52,9 @@ motor_pwm_init(pi, MOTOR_PWM)
 
 # 開始時刻を記録
 start_time = time.time()
-move_time1 = 3
-move_time2 = 6
+move_time1 = 2
+stop_time = 1
+move_time2 = 4
 
 # メインループ
 try:
@@ -65,12 +66,16 @@ try:
             # 最初の3秒間はmotor_value=3.0
             motor_value = 3.0
             update_motor = True
-        elif elapsed_time < move_time2:
-            # 次の3秒間はmotor_value=-3.0
+        elif elapsed_time < move_time1 + stop_time:
+            # 次の1秒間は停止
+            motor_value = 0.0
+            update_motor = False
+        elif elapsed_time < move_time2 + stop_time:
+            # その後3秒間はmotor_value=-3.0
             motor_value = -3.0
             update_motor = True
         else:
-            # 6秒経過後はモーターを停止
+            # 全ての操作後はモーターを停止
             motor_value = 0.0
             update_motor = False
 
@@ -79,7 +84,7 @@ try:
                              MOTOR_PWM, MAX_VOLTAGE, BATTERY_VOLTAGE, LED_G, LED_R)
         time.sleep(0.1)  # 必要に応じてスリープ時間を調整
 
-        if elapsed_time >= move_time2:
+        if elapsed_time >= move_time2 + stop_time:
             break  # ループを終了
 
 except KeyboardInterrupt:
