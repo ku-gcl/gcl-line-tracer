@@ -116,7 +116,7 @@ def stop_motor(duration=1):
 try:
     # 前進、停止、後進のシーケンス
     move_forward(duration=2, start_speed=10, end_speed=100, step=10, delay=0.2)    # 2秒間前進（速度10→100）
-    move_backward(duration=4, start_speed=10, end_speed=100, step=10, delay=0.2)   # 4秒間後進（速度10→100）
+    move_backward(duration=2, start_speed=10, end_speed=100, step=10, delay=0.2)   # 4秒間後進（速度10→100）
     # 必要に応じて追加の動作をここに記述
 except KeyboardInterrupt:
     pass  # Ctrl+Cによる終了を許可

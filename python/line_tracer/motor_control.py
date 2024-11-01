@@ -49,15 +49,16 @@ def motor_control_update(pi, motor_value, update_motor, MOTOR1_IN1, MOTOR1_IN2, 
         return
 
     # モーター電圧の制限
-    if motor_value > MAX_VOLTAGE:
-        motor_value = MAX_VOLTAGE
-    elif motor_value < -MAX_VOLTAGE:
-        motor_value = -MAX_VOLTAGE
+    # if motor_value > MAX_VOLTAGE:
+    #     motor_value = MAX_VOLTAGE
+    # elif motor_value < -MAX_VOLTAGE:
+    #     motor_value = -MAX_VOLTAGE
 
-    # PWMデューティサイクルの計算
-    pwm_duty = int(abs(motor_value) * 100.0 / BATTERY_VOLTAGE)
-    if pwm_duty > 100:
-        pwm_duty = 100  # 100%を超えないように制限
+    # # PWMデューティサイクルの計算
+    # pwm_duty = int(abs(motor_value) * 100.0 / BATTERY_VOLTAGE)
+    # if pwm_duty > 100:
+    #     pwm_duty = 100  # 100%を超えないように制限
+    pwm_duty = abs(motor_value)
         
     print(pwm_duty)
 
