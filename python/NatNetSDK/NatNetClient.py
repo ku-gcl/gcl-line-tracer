@@ -20,8 +20,8 @@ import struct
 from threading import Thread
 import copy
 import time
-import NatNetSDK.DataDescriptions
-import NatNetSDK.MoCapData
+import NatNetSDK.DataDescriptions as DataDescriptions
+import NatNetSDK.MoCapData as MoCapData
 
 def trace( *args ):
     # uncomment the one you want to use
@@ -561,6 +561,7 @@ class NatNetClient:
         #    marker_set_data.add_unlabeled_marker(pos)
         return offset, marker_set_data
 
+    # これを使用する
     def __unpack_rigid_body_data( self, data, packet_size, major, minor):
         rigid_body_data = MoCapData.RigidBodyData()
         offset = 0
